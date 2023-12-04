@@ -1,0 +1,48 @@
+Primeria Sessão de Testes (Online, em reunião, compartilhando tela, vários apps abertos)
+==================================
+Average CPU Time: 0.565096 seconds
+Average CPU Time: 0.577484 seconds
+Average CPU Time: 0.873854 seconds
+Average CPU Time: 4.531871 seconds
+==================================
+Average CPU Time: 0.561599 seconds
+Average CPU Time: 0.598925 seconds
+Average CPU Time: 1.073301 seconds
+Average CPU Time: 6.920888 seconds
+==================================
+Average CPU Time: 0.561623 seconds
+Average CPU Time: 0.572525 seconds
+Average CPU Time: 0.843118 seconds
+Average CPU Time: 4.338693 seconds
+==================================
+
+Segunda Sessão de Testes (Offline, PC reiniciado, vários processos fechados)
+==================================
+Average CPU Time: 0.523945 seconds
+Average CPU Time: 0.538656 seconds ===> 0.539.746 seconds
+Average CPU Time: 0.824877 seconds
+Average CPU Time: 4.447629 seconds
+==================================
+Average CPU Time: 0.522406 seconds
+Average CPU Time: 0.570073 seconds ===> 0.569418 seconds
+Average CPU Time: 1.028561 seconds
+Average CPU Time: 6.806089 seconds
+==================================
+Average CPU Time: 0.524014 seconds
+Average CPU Time: 0.541203 seconds ===> 0.540091 seconds
+Average CPU Time: 0.791308 seconds
+Average CPU Time: 4.241786 seconds
+==================================
+
+Sessão extra apenas com Star.png para avaliar possibilidade de incônsistências
+Os valores obtidos serão somados com o original e será tirado uma média
+==================================
+V2:
+Average CPU Time: 0.539683 seconds
+Average CPU Time: 0.539388 seconds
+V1:
+Average CPU Time: 0.568442 seconds
+Average CPU Time: 0.569739 seconds
+Simple:
+Average CPU Time: 0.540705 seconds
+Average CPU Time: 0.539877 seconds
