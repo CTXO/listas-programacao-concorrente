@@ -1,0 +1,9 @@
+sync.WaitGroup():
+Average CPU Time: 0.522774 seconds
+Average CPU Time: 0.538498 seconds
+Average CPU Time: 0.790820 seconds
+Average CPU Time: 4.257154 seconds
+Channel:Average CPU Time: 0.523809 seconds
+Average CPU Time: 0.539135 seconds
+Average CPU Time: 0.790742 seconds
+Average CPU Time: 4.270367 seconds
