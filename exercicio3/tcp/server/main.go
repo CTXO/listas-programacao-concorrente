@@ -37,12 +37,12 @@ func main() {
 func greyScaleServer(conn net.Conn) {
 	defer conn.Close()
 
-	fmt.Println("Receiving image from client...")
+	// fmt.Println("Receiving image from client...")
 	img := bytesToImg(conn)
-	fmt.Println("Received image from client")
+	// fmt.Println("Received image from client")
 	pixels := imgToTensor(img)
 	greyScale(&pixels)
-	fmt.Println("Sending image to client...")
+	/// fmt.Println("Sending image to client...")
 	img = tensorToImg(pixels)
 
 	buf := new(bytes.Buffer)

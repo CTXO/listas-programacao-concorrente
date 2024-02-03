@@ -47,7 +47,7 @@ func handleClient(conn *net.UDPConn) {
             fmt.Println("Error reading from udp: ", err)
             break
         }
-		fmt.Printf("Received %d bytes from %s\n", n, clientAddr)
+		// fmt.Printf("Received %d bytes from %s\n", n, clientAddr)
 		imageData = append(imageData, buffer[:n]...)
         if n < bufferSize {
             clientAddrFinal = clientAddr;
@@ -117,6 +117,7 @@ func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
         fmt.Println("Error opening file: ", err)
     }
     defer tempFile.Close()
+	defer os.Remove(path)
     
 
     _, err = tempFile.Write(imageBytes)
@@ -134,13 +135,13 @@ func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
 			return err
 		}
 
-		fmt.Println("Sending ", n, "bytes to client")
+		// fmt.Println("Sending ", n, "bytes to client")
 		_, err = conn.WriteToUDP(buffer[:n], addr)
 		if err != nil {
 			return err
 		}
 		if n < 65000 {
-			fmt.Println("Image completely sent!")
+			// fmt.Println("Image completely sent!")
             break
         }
 		reply := make([]byte, 1024) 

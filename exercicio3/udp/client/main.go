@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -25,26 +26,51 @@ func main() {
 		return
 	}
 
-	
-	conn, err := net.DialUDP("udp", nil, serverAddr)
+	logFilename := "apple.log"
+	iterations := 10000
+	var totalElapsed time.Duration
+	for i :=0; i < iterations; i++ {
+		start := time.Now()
+		conn, err := net.DialUDP("udp", nil, serverAddr)
+		defer conn.Close()
+		if err != nil {
+			fmt.Println("Error connecting to server:", err)
+			return
+		}
+
+		
+		err = sendImage(conn, absolutePath)
+		if err != nil {
+			fmt.Println("Error sending image:", err)
+			return
+		}
+
+		imageData, err := receiveImage(conn)
+		if err != nil {
+			fmt.Println("Error receiving image: ", err)
+			return
+		}
+		rttTime := time.Since(start)
+		totalElapsed += rttTime
+		
+		
+		err = saveImage(imageData, "greyscale.png")
+		if err != nil{
+			fmt.Println(err)
+		}
+		
+
+		err = appendTimeToFile(logFilename, rttTime, fmt.Sprintf("%d - ", i+1))
+		if err != nil {
+			fmt.Println("Error appending time to file: ", err)
+		}
+	} 
+
+	averageElapsed := totalElapsed / time.Duration(iterations)
+	err = appendTimeToFile(logFilename, averageElapsed, "Average ")
 	if err != nil {
-		fmt.Println("Error connecting to server:", err)
-		return
+		fmt.Println("Error appending time to file: ", err)
 	}
-	defer conn.Close()
-
-    err = sendImage(conn, absolutePath)
-    if err != nil {
-        fmt.Println("Error sending image:", err)
-        return
-    }
-
-    err = receiveImage(conn)
-    if err != nil {
-        fmt.Println("Error receiving image: ", err)
-        return
-    }
-
 }
 
 func openImage(path string) (image.Image, error) {
@@ -76,15 +102,15 @@ func sendImage(conn *net.UDPConn, filename string) error {
 		if err != nil {
             fmt.Println("Error reading from udp: ", err)
             break
-    }
-        fmt.Println("Sending ", n, " bytes to server")
+		}
+        // fmt.Println("Sending ", n, " bytes to server")
 		_, err = conn.Write(buffer[:n])
 		if err != nil {
 			return err
 		}
 
 		if n < bufferSize {
-            fmt.Println("Image completely sent!")
+            // fmt.Println("Image completely sent!")
             break
         }
 
@@ -97,7 +123,7 @@ func sendImage(conn *net.UDPConn, filename string) error {
 	return nil
 }
 
-func receiveImage(conn *net.UDPConn) error {
+func receiveImage(conn *net.UDPConn) ([]byte, error) {
     bufferSize := 65000
     buffer := make([]byte, bufferSize) 
 
@@ -105,14 +131,14 @@ func receiveImage(conn *net.UDPConn) error {
     i := 0
 	for {
 		n, _, err := conn.ReadFromUDP(buffer)
-        fmt.Println("Received ", n, " bytes from server")
+        // fmt.Println("Received ", n, " bytes from server")
         if err != nil {
             fmt.Println("Error reading from udp: ", err)
             break
         }
 		imageData = append(imageData, buffer[:n]...)
         if n < bufferSize {
-            fmt.Println("Image completely received!")
+            // fmt.Println("Image completely received!")
             break
         }
 
@@ -123,13 +149,9 @@ func receiveImage(conn *net.UDPConn) error {
 			fmt.Println(err)
 		}
 	}
-	err := saveImage(imageData, "greyscale.png")
-	if err != nil{
-		fmt.Println(err)
-        return err
-	}
-    return nil
+    return imageData, nil
 }
+
 
 func saveImage(data []byte, filename string) error {
 	file, err := os.Create(filename)
@@ -140,4 +162,23 @@ func saveImage(data []byte, filename string) error {
 
 	_, err = file.Write(data)
 	return err
+}
+
+
+func appendTimeToFile(filename string, elapsed time.Duration, prefix string) error {
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	elapsedMilliseconds := elapsed.Milliseconds()
+	elapsedStr := fmt.Sprintf("%s Execution time: %d ms\n", prefix, elapsedMilliseconds)
+
+
+	if _, err := file.WriteString(elapsedStr); err != nil {
+		return err
+	}
+
+	return nil
 }
