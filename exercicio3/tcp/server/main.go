@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("listening...")
+	fmt.Println("Listening...")
 	ln, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		fmt.Println(err)
@@ -37,21 +37,25 @@ func main() {
 func greyScaleServer(conn net.Conn) {
 	defer conn.Close()
 
+	fmt.Println("Receiving image from client...")
 	img := bytesToImg(conn)
+	fmt.Println("Received image from client")
 	pixels := imgToTensor(img)
 	greyScale(&pixels)
+	fmt.Println("Sending image to client...")
 	img = tensorToImg(pixels)
 
 	buf := new(bytes.Buffer)
 	err := png.Encode(buf, img)
 	imageBytes := buf.Bytes()
 
-	// Send some data to the server
 	_, err = conn.Write(imageBytes)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Println("Image sent\n")
+	fmt.Println("Listening...")
 
 }
 

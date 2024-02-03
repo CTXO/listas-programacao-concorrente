@@ -13,7 +13,7 @@ import (
 func main() {
 	//absolutePath, err := filepath.Abs("imgs/Apple.png")
 	//absolutePath, err := filepath.Abs("imgs/Cake.png")
-	absolutePath, err := filepath.Abs("imgs/Painting.png")
+	//absolutePath, err := filepath.Abs("imgs/Painting.png")
 	//absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
@@ -33,11 +33,10 @@ func main() {
 		return
 	}
 
+	fmt.Println("Sending image to server")
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, img)
 	imageBytes := buf.Bytes()
-
-	// Send some data to the server
 	_, err = conn.Write(imageBytes)
 
 	if err != nil {
@@ -45,9 +44,9 @@ func main() {
 		return
 	}
 
-	// Display what the server responded
-
+	fmt.Println("Waiting for image from server...")
 	imgGrey := bytesToImg(conn)
+	fmt.Println("Received image from server")
 	path, err := filepath.Abs("greyscale.png")
 	if err != nil {
 		fmt.Println("Error creating file:", err)
@@ -64,6 +63,7 @@ func main() {
 	//Save img to a File
 	err = png.Encode(fg, imgGrey)
 	// Close the connection
+	fmt.Println("Image saved")
 }
 
 func openImage(path string) (image.Image, error) {
