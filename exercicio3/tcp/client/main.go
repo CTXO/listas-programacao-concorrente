@@ -25,7 +25,7 @@ func main() {
 		fmt.Println("Error getting image: ", err)
 		return
 	}
-	// Connect to the server
+
 	conn, err := net.Dial("tcp", "localhost:8080")
 	defer conn.Close()
 	if err != nil {
@@ -60,9 +60,9 @@ func main() {
 	}
 	defer fg.Close()
 
-	//Save img to a File
+	
 	err = png.Encode(fg, imgGrey)
-	// Close the connection
+	
 	fmt.Println("Image saved")
 }
 

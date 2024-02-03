@@ -14,14 +14,12 @@ import (
     "path/filepath"
 )
 func main() {
-	// Listen for incoming UDP packets on port 8080
 	serverAddr, err := net.ResolveUDPAddr("udp", "localhost:8080")
 	if err != nil {
 		fmt.Println("Error resolving address:", err)
 		return
 	}
 
-	// Create UDP listener
 	conn, err := net.ListenUDP("udp", serverAddr)
 	if err != nil {
 		fmt.Println("Error listening:", err)
@@ -31,7 +29,6 @@ func main() {
 
 	fmt.Println("Server listening on", serverAddr)
 
-	// Handle incoming UDP messages
 	for {
 		handleClient(conn)
 	}
@@ -39,9 +36,8 @@ func main() {
 
 func handleClient(conn *net.UDPConn) {
     bufferSize := 65000
-    buffer := make([]byte, bufferSize) // Use a larger buffer for handling potential larger chunks
+    buffer := make([]byte, bufferSize) 
 
-	// Receive the image data in chunks
 	var imageData []byte
     var clientAddrFinal *net.UDPAddr
     i := 0 
@@ -68,7 +64,6 @@ func handleClient(conn *net.UDPConn) {
 
 	}
 
-	// Process the received image data (e.g., save it to a file)
 	img := bytesToImg(imageData)
     pixels := imgToTensor(img)
 	greyScale(&pixels)
@@ -78,17 +73,6 @@ func handleClient(conn *net.UDPConn) {
 	if err != nil {
 		fmt.Println("Error on send image: ", err)
 	}
-
-    // file, err := os.Create("greyscale.png")
-    // if err != nil {
-	// 	fmt.Println("Error creating file:", err)
-	// 	return
-	// }
-	// defer file.Close()
-	// err = png.Encode(file, img)
-    // if err !=nil {
-    //     fmt.Println("Error encoding png: ", err)
-    // }
 
 }
 
@@ -139,19 +123,17 @@ func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
     if err != nil {}
 
 
-	buffer := make([]byte, 65000) // Use a larger buffer for handling potential larger chunks
+	buffer := make([]byte, 65000) 
 	for {
-		// Read a chunk of the image file
 		n, err := tempFile.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
                 fmt.Println("EOF")
-				break // End of file, exit the loop
+				break
 			}
 			return err
 		}
 
-		// Send the chunk to the server
 		fmt.Println("Sending ", n, "bytes to client")
 		_, err = conn.WriteToUDP(buffer[:n], addr)
 		if err != nil {
@@ -166,14 +148,13 @@ func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
         if err != nil {
             fmt.Println("Error reading server response: ", err)
         }
-        // fmt.Println(string(reply[:nReply]))
 		
 	}
 
 	return nil
 } 
 
-// Converting image.YCbCr format to one which we can manipulate the pixels
+
 func imgToTensor(img image.Image) [][]color.Color {
 	size := img.Bounds().Size()
 	var pixels [][]color.Color
@@ -260,7 +241,6 @@ func imageToBytes(img image.Image) ([]byte, error) {
 		return nil, err
 	}
 
-	// Converta para base64 ou use buf.Bytes() diretamente dependendo dos requisitos
 	return buf.Bytes(), nil
 }
 

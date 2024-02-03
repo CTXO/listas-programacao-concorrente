@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-    // "io"
 )
 
 func main() {
@@ -26,7 +25,7 @@ func main() {
 		return
 	}
 
-	// Create UDP connection
+	
 	conn, err := net.DialUDP("udp", nil, serverAddr)
 	if err != nil {
 		fmt.Println("Error connecting to server:", err)
@@ -70,17 +69,15 @@ func sendImage(conn *net.UDPConn, filename string) error {
 	defer file.Close()
 
     bufferSize := 65000
-	buffer := make([]byte, bufferSize) // Use a larger buffer for handling potential larger chunks
+	buffer := make([]byte, bufferSize) 
 	reply := make([]byte, 1024) 
 	for {
-		// Read a chunk of the image file
 		n, err := file.Read(buffer)
 		if err != nil {
             fmt.Println("Error reading from udp: ", err)
             break
     }
         fmt.Println("Sending ", n, " bytes to server")
-		// Send the chunk to the server
 		_, err = conn.Write(buffer[:n])
 		if err != nil {
 			return err
@@ -95,8 +92,6 @@ func sendImage(conn *net.UDPConn, filename string) error {
         if err != nil {
             fmt.Println("Error reading server response: ", err)
         }
-        // fmt.Println(string(reply[:nReply]))
-
 	}
 
 	return nil
@@ -104,9 +99,8 @@ func sendImage(conn *net.UDPConn, filename string) error {
 
 func receiveImage(conn *net.UDPConn) error {
     bufferSize := 65000
-    buffer := make([]byte, bufferSize) // Use a larger buffer for handling potential larger chunks
+    buffer := make([]byte, bufferSize) 
 
-	// Receive the image data in chunks
 	var imageData []byte
     i := 0
 	for {
