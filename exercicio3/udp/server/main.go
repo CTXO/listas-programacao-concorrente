@@ -46,7 +46,6 @@ func handleClient(conn *net.UDPConn) {
     var clientAddrFinal *net.UDPAddr
     i := 0 
 	for {
-		fmt.Println("About to read buffer iteration: ", i)
 		n, clientAddr, err := conn.ReadFromUDP(buffer)
         if err != nil {
             fmt.Println("Error reading from udp: ", err)
@@ -55,8 +54,8 @@ func handleClient(conn *net.UDPConn) {
 		fmt.Printf("Received %d bytes from %s\n", n, clientAddr)
 		imageData = append(imageData, buffer[:n]...)
         if n < bufferSize {
-            fmt.Println("chegou no final")
             clientAddrFinal = clientAddr;
+			fmt.Println("Image completely received!")
             break
         }
 
@@ -75,13 +74,10 @@ func handleClient(conn *net.UDPConn) {
 	greyScale(&pixels)
 	img = tensorToImg(pixels)
 
-    fmt.Println("Sending image...", clientAddrFinal)
-    
 	err := sendImage(conn, img, clientAddrFinal)
 	if err != nil {
 		fmt.Println("Error on send image: ", err)
 	}
-    fmt.Println("after Sending image")
 
     // file, err := os.Create("greyscale.png")
     // if err != nil {
@@ -116,7 +112,6 @@ func bytesToImg(imgBytes []byte) image.Image {
 }
 
 func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
-    fmt.Println("Started converting image to bytes")
 	imageBytes, err := imageToBytes(img)
 	if err != nil {
 		return err
@@ -147,9 +142,7 @@ func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
 	buffer := make([]byte, 65000) // Use a larger buffer for handling potential larger chunks
 	for {
 		// Read a chunk of the image file
-        fmt.Println("Inside for")
 		n, err := tempFile.Read(buffer)
-        fmt.Println("After read ", n)
 		if err != nil {
 			if err == io.EOF {
                 fmt.Println("EOF")
@@ -159,22 +152,21 @@ func sendImage(conn *net.UDPConn, img image.Image, addr *net.UDPAddr) error {
 		}
 
 		// Send the chunk to the server
-        fmt.Println("About to write bytes to client")
+		fmt.Println("Sending ", n, "bytes to client")
 		_, err = conn.WriteToUDP(buffer[:n], addr)
-        fmt.Println("wrote bytes to client ", n)
 		if err != nil {
 			return err
 		}
 		if n < 65000 {
-            fmt.Println("chegou no final")
+			fmt.Println("Image completely sent!")
             break
         }
 		reply := make([]byte, 1024) 
-		nReply, _, err := conn.ReadFromUDP(reply);
+		_, _, err = conn.ReadFromUDP(reply);
         if err != nil {
             fmt.Println("Error reading server response: ", err)
         }
-        fmt.Println(string(reply[:nReply]))
+        // fmt.Println(string(reply[:nReply]))
 		
 	}
 

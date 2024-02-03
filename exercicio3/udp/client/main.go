@@ -11,15 +11,14 @@ import (
 
 func main() {
 	// Resolve server address
-	// absolutePath, err := filepath.Abs("imgs/Apple.png")
-	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	 absolutePath, err := filepath.Abs("imgs/Apple.png")
+	// absolutePath, err := filepath.Abs("imgs/Cake.png")
 	// absolutePath, err := filepath.Abs("imgs/Painting.png")
-	//absolutePath, err := filepath.Abs("imgs/Star.png")
+	// absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
 		return
 	}
-
 
 	serverAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:8080")
 	if err != nil {
@@ -80,8 +79,7 @@ func sendImage(conn *net.UDPConn, filename string) error {
             fmt.Println("Error reading from udp: ", err)
             break
     }
-        fmt.Println("Read bytes from buffer", n)
-
+        fmt.Println("Sending ", n, " bytes to server")
 		// Send the chunk to the server
 		_, err = conn.Write(buffer[:n])
 		if err != nil {
@@ -89,15 +87,15 @@ func sendImage(conn *net.UDPConn, filename string) error {
 		}
 
 		if n < bufferSize {
-            fmt.Println("chegou no final")
+            fmt.Println("Image completely sent!")
             break
         }
 
-        nReply, _, err := conn.ReadFromUDP(reply);
+        _, _, err = conn.ReadFromUDP(reply);
         if err != nil {
             fmt.Println("Error reading server response: ", err)
         }
-        fmt.Println(string(reply[:nReply]))
+        // fmt.Println(string(reply[:nReply]))
 
 	}
 
@@ -113,14 +111,14 @@ func receiveImage(conn *net.UDPConn) error {
     i := 0
 	for {
 		n, _, err := conn.ReadFromUDP(buffer)
-        fmt.Println("N: ", n)
+        fmt.Println("Received ", n, " bytes from server")
         if err != nil {
             fmt.Println("Error reading from udp: ", err)
             break
         }
 		imageData = append(imageData, buffer[:n]...)
         if n < bufferSize {
-            fmt.Println("chegou no final")
+            fmt.Println("Image completely received!")
             break
         }
 
@@ -131,8 +129,6 @@ func receiveImage(conn *net.UDPConn) error {
 			fmt.Println(err)
 		}
 	}
-
-	fmt.Println("Recebeu tudo")
 	err := saveImage(imageData, "greyscale.png")
 	if err != nil{
 		fmt.Println(err)
