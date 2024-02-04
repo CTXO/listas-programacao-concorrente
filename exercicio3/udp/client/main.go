@@ -11,10 +11,10 @@ import (
 
 func main() {
 	// Resolve server address
-	 absolutePath, err := filepath.Abs("imgs/Apple.png")
-	// absolutePath, err := filepath.Abs("imgs/Cake.png")
-	// absolutePath, err := filepath.Abs("imgs/Painting.png")
-	// absolutePath, err := filepath.Abs("imgs/Star.png")
+	// absolutePath, err := filepath.Abs("imgs/Apple.png")
+	absolutePath, err := filepath.Abs("imgs/Cake.png")
+    // absolutePath, err := filepath.Abs("imgs/Painting.png")
+ 	// absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
 		return
@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	logFilename := "apple.log"
+	logFilename := "cake.log"
 	iterations := 10000
 	var totalElapsed time.Duration
 	for i :=0; i < iterations; i++ {
@@ -60,7 +60,7 @@ func main() {
 		}
 		
 
-		err = appendTimeToFile(logFilename, rttTime, fmt.Sprintf("%d - ", i+1))
+		err = appendTimeToFile(logFilename, rttTime, "")
 		if err != nil {
 			fmt.Println("Error appending time to file: ", err)
 		}
@@ -172,8 +172,7 @@ func appendTimeToFile(filename string, elapsed time.Duration, prefix string) err
 	}
 	defer file.Close()
 
-	elapsedMilliseconds := elapsed.Milliseconds()
-	elapsedStr := fmt.Sprintf("%s Execution time: %d ms\n", prefix, elapsedMilliseconds)
+	elapsedStr := fmt.Sprintf("%s Execution time: %s\n", prefix, elapsed)
 
 
 	if _, err := file.WriteString(elapsedStr); err != nil {

@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	// absolutePath, err := filepath.Abs("imgs/Apple.png")
-	//absolutePath, err := filepath.Abs("imgs/Cake.png")
-	absolutePath, err := filepath.Abs("imgs/Painting.png")
+	// absolutePath, err := filepath.Abs("imgs/Star.png")
+	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	//absolutePath, err := filepath.Abs("imgs/Painting.png")
 	//absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
@@ -31,7 +31,7 @@ func main() {
 	err = png.Encode(buf, img)
 	imageBytes := buf.Bytes()
 	
-	logFilename := "painting.log"
+	logFilename := "cake.log"
 	iterations := 10000
 	var totalElapsed time.Duration
 	for i := 0; i < iterations; i++{
@@ -120,8 +120,7 @@ func appendTimeToFile(filename string, elapsed time.Duration, prefix string) err
 	}
 	defer file.Close()
 
-	elapsedMilliseconds := elapsed.Milliseconds()
-	elapsedStr := fmt.Sprintf("%s Execution time: %d ms\n", prefix, elapsedMilliseconds)
+	elapsedStr := fmt.Sprintf("%s Execution time: %s\n", prefix, elapsed)
 
 
 	if _, err := file.WriteString(elapsedStr); err != nil {
