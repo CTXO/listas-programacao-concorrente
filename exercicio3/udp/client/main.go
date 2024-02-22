@@ -10,9 +10,8 @@ import (
 )
 
 func main() {
-	// Resolve server address
-	// absolutePath, err := filepath.Abs("imgs/Apple.png")
-	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	 absolutePath, err := filepath.Abs("imgs/Apple.png")
+	// absolutePath, err := filepath.Abs("imgs/Cake.png")
     // absolutePath, err := filepath.Abs("imgs/Painting.png")
  	// absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
@@ -27,7 +26,7 @@ func main() {
 	}
 
 	logFilename := "cake.log"
-	iterations := 10000
+	iterations := 1
 	var totalElapsed time.Duration
 	for i :=0; i < iterations; i++ {
 		start := time.Now()
@@ -103,14 +102,14 @@ func sendImage(conn *net.UDPConn, filename string) error {
             fmt.Println("Error reading from udp: ", err)
             break
 		}
-        // fmt.Println("Sending ", n, " bytes to server")
+        fmt.Println("Sending ", n, " bytes to server")
 		_, err = conn.Write(buffer[:n])
 		if err != nil {
 			return err
 		}
 
 		if n < bufferSize {
-            // fmt.Println("Image completely sent!")
+            fmt.Println("Image completely sent!")
             break
         }
 
@@ -131,14 +130,14 @@ func receiveImage(conn *net.UDPConn) ([]byte, error) {
     i := 0
 	for {
 		n, _, err := conn.ReadFromUDP(buffer)
-        // fmt.Println("Received ", n, " bytes from server")
+        fmt.Println("Received ", n, " bytes from server")
         if err != nil {
             fmt.Println("Error reading from udp: ", err)
             break
         }
 		imageData = append(imageData, buffer[:n]...)
         if n < bufferSize {
-            // fmt.Println("Image completely received!")
+            fmt.Println("Image completely received!")
             break
         }
 
