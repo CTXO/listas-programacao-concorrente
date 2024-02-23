@@ -12,8 +12,8 @@ import (
 )
 
 func main() {
-	// absolutePath, err := filepath.Abs("imgs/Star.png")
-	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	absolutePath, err := filepath.Abs("imgs/Apple.png")
+	// absolutePath, err := filepath.Abs("imgs/Cake.png")
 	//absolutePath, err := filepath.Abs("imgs/Painting.png")
 	//absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
@@ -32,7 +32,7 @@ func main() {
 	imageBytes := buf.Bytes()
 	
 	logFilename := "cake.log"
-	iterations := 10000
+	iterations := 1
 	var totalElapsed time.Duration
 	for i := 0; i < iterations; i++{
 		start := time.Now()
@@ -43,7 +43,7 @@ func main() {
 			return
 		}
 
-		// fmt.Println("Sending image to server")
+		fmt.Println("Sending image to server")
 		_, err = conn.Write(imageBytes)
 
 		if err != nil {
@@ -51,11 +51,11 @@ func main() {
 			return
 		}
 
-		// fmt.Println("Waiting for image from server...")
+		fmt.Println("Waiting for image from server...")
 		imgGrey := bytesToImg(conn)
 		rttTime := time.Since(start)
 		totalElapsed += rttTime
-		// fmt.Println("Received image from server")
+		fmt.Println("Received image from server")
 
 		
 		path, err := filepath.Abs("greyscale.png")
@@ -70,11 +70,9 @@ func main() {
 			return
 		}
 		defer fg.Close()
-
-		
 		err = png.Encode(fg, imgGrey)
 		
-		// fmt.Println("Image saved")
+		fmt.Println("Image saved")
 		err = appendTimeToFile(logFilename, rttTime, "")
 		if err != nil {
 			fmt.Println("Error appending time to file: ", err)
