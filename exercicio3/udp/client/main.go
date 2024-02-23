@@ -73,20 +73,6 @@ func main() {
 	}
 }
 
-func openImage(path string) (image.Image, error) {
-	f, err := os.Open(path)
-	defer f.Close()
-	if err != nil {
-		return nil, err
-	}
-	img, _, err := image.Decode(f)
-
-	if err != nil {
-		return nil, err
-	}
-	return img, nil
-}
-
 func sendImage(conn *net.UDPConn, filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {

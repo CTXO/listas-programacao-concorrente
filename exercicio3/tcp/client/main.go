@@ -58,7 +58,6 @@ func main() {
 		// fmt.Println("Received image from server")
 
 		
-
 		path, err := filepath.Abs("greyscale.png")
 		if err != nil {
 			fmt.Println("Error creating file:", err)
