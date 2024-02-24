@@ -19,7 +19,7 @@ type Args struct {
 
 type GreyImage []byte
 
-func (g *GreyImage) greyScaleServerRPC(args *Args, reply *[]byte) error {
+func (g *GreyImage) GreyscaleRPC(args *Args, reply *[]byte) error {
 	img, err := bytesToImg(args.Image)
 	if err != nil {
 		fmt.Println(err)
