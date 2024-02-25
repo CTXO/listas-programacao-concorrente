@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Args struct {
@@ -16,8 +17,8 @@ type Args struct {
 
 func main() {
 	//absolutePath, err := filepath.Abs("imgs/Apple.png")
-	//absolutePath, err := filepath.Abs("imgs/Cake.png")
-	absolutePath, err := filepath.Abs("imgs/Painting.png")
+	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	//absolutePath, err := filepath.Abs("imgs/Painting.png")
 	//absolutePath, err := filepath.Abs("imgs/Star.png")
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
@@ -40,26 +41,47 @@ func main() {
 	}
 	imageBytes := buf.Bytes()
 
-	//Connecting with the server
-	client, err := rpc.DialHTTP("tcp", "localhost"+":8080")
-	if err != nil {
-		fmt.Println(err)
+	logFilename := "cake.log"
+	iterations := 1000
+	var totalElapsed time.Duration
+	for i := 0; i < iterations; i++ {
+		start := time.Now()
+		//Connecting with the server
+		client, err := rpc.DialHTTP("tcp", "localhost"+":8080")
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		//Requesting Greyscale Service
+		var reply []byte
+		args := Args{imageBytes}
+		err = client.Call("GreyImage.GreyscaleRPC", args, &reply)
+		if err != nil {
+			fmt.Println(err)
+		}
+		rttTime := time.Since(start)
+		totalElapsed += rttTime
+
+		//Saving Image received from Server
+		newImg, err := bytesToImg(reply)
+		if err != nil {
+			fmt.Println(err)
+		}
+		saveImage(newImg)
+
+		//Saving the elapsed time of the iteration
+		err = appendTimeToFile(logFilename, rttTime, "")
+		if err != nil {
+			fmt.Println("Error appending time to file: ", err)
+		}
 	}
 
-	//Requesting Greyscale Service
-	var reply []byte
-	args := Args{imageBytes}
-	err = client.Call("GreyImage.GreyscaleRPC", args, &reply)
+	//Getting the average elapsed time
+	averageElapsed := totalElapsed / time.Duration(iterations)
+	err = appendTimeToFile(logFilename, averageElapsed, "Average ")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error appending time to file: ", err)
 	}
-
-	//Saving Image received from Server
-	newImg, err := bytesToImg(reply)
-	if err != nil {
-		fmt.Println(err)
-	}
-	saveImage(newImg)
 }
 
 func openImage(path string) (image.Image, error) {
@@ -105,6 +127,21 @@ func saveImage(img image.Image) error {
 		return err
 	}
 
-	fmt.Println("Image saved")
+	return nil
+}
+
+func appendTimeToFile(filename string, elapsed time.Duration, prefix string) error {
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	elapsedStr := fmt.Sprintf("%s%d\n", prefix, elapsed.Microseconds())
+
+	if _, err := file.WriteString(elapsedStr); err != nil {
+		return err
+	}
+
 	return nil
 }

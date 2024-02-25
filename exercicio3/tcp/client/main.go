@@ -30,11 +30,11 @@ func main() {
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, img)
 	imageBytes := buf.Bytes()
-	
+
 	logFilename := "cake.log"
 	iterations := 1
 	var totalElapsed time.Duration
-	for i := 0; i < iterations; i++{
+	for i := 0; i < iterations; i++ {
 		start := time.Now()
 		conn, err := net.Dial("tcp", "localhost:8080")
 		defer conn.Close()
@@ -57,7 +57,6 @@ func main() {
 		totalElapsed += rttTime
 		fmt.Println("Received image from server")
 
-		
 		path, err := filepath.Abs("greyscale.png")
 		if err != nil {
 			fmt.Println("Error creating file:", err)
@@ -71,7 +70,7 @@ func main() {
 		}
 		defer fg.Close()
 		err = png.Encode(fg, imgGrey)
-		
+
 		fmt.Println("Image saved")
 		err = appendTimeToFile(logFilename, rttTime, "")
 		if err != nil {
@@ -85,8 +84,6 @@ func main() {
 		fmt.Println("Error appending time to file: ", err)
 	}
 }
-
-
 
 func openImage(path string) (image.Image, error) {
 	f, err := os.Open(path)
@@ -118,7 +115,6 @@ func appendTimeToFile(filename string, elapsed time.Duration, prefix string) err
 	defer file.Close()
 
 	elapsedStr := fmt.Sprintf("%s Execution time: %s\n", prefix, elapsed)
-
 
 	if _, err := file.WriteString(elapsedStr); err != nil {
 		return err
