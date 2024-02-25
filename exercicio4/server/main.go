@@ -41,12 +41,9 @@ func (g *GreyImage) GreyscaleRPC(args *Args, reply *[]byte) error {
 }
 
 func main() {
-	// Create a new RPC server
 	greyImage := new(GreyImage)
-	// Register RPC server
 	rpc.Register(greyImage)
 	rpc.HandleHTTP()
-	// Listen for requests on port 8080
 	l, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		fmt.Println(err)

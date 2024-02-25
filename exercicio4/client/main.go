@@ -16,10 +16,11 @@ type Args struct {
 }
 
 func main() {
-	//absolutePath, err := filepath.Abs("imgs/Apple.png")
-	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	absolutePath, err := filepath.Abs("imgs/Apple.png")
+	// absolutePath, err := filepath.Abs("imgs/Cake.png")
 	//absolutePath, err := filepath.Abs("imgs/Painting.png")
-	//absolutePath, err := filepath.Abs("imgs/Star.png")
+	// absolutePath, err := filepath.Abs("imgs/Star.png")
+	logFilename := "apple.log"
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
 		return
@@ -41,13 +42,12 @@ func main() {
 	}
 	imageBytes := buf.Bytes()
 
-	logFilename := "cake.log"
-	iterations := 1000
+	iterations := 10000
 	var totalElapsed time.Duration
 	for i := 0; i < iterations; i++ {
+		client, err := rpc.DialHTTP("tcp", "localhost"+":8080")
 		start := time.Now()
 		//Connecting with the server
-		client, err := rpc.DialHTTP("tcp", "localhost"+":8080")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -74,6 +74,7 @@ func main() {
 		if err != nil {
 			fmt.Println("Error appending time to file: ", err)
 		}
+		client.Close()
 	}
 
 	//Getting the average elapsed time
@@ -89,7 +90,6 @@ func openImage(path string) (image.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
