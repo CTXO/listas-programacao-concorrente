@@ -24,11 +24,13 @@ func (g *GreyImage) GreyscaleRPC(args *Args, reply *[]byte) error {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Image received")
 
 	pixels := imgToTensor(img)
 	greyScale(&pixels)
 	img = tensorToImg(pixels)
 
+	fmt.Println("Sending greyscale image...")
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, img)
 	if err != nil {
@@ -45,6 +47,7 @@ func main() {
 	rpc.Register(greyImage)
 	rpc.HandleHTTP()
 	l, err := net.Listen("tcp", ":8080")
+	fmt.Println("Listening...")
 	if err != nil {
 		fmt.Println(err)
 	}

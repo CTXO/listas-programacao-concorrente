@@ -16,11 +16,11 @@ type Args struct {
 }
 
 func main() {
-	absolutePath, err := filepath.Abs("imgs/Apple.png")
+	//absolutePath, err := filepath.Abs("imgs/Apple.png")
 	// absolutePath, err := filepath.Abs("imgs/Cake.png")
-	//absolutePath, err := filepath.Abs("imgs/Painting.png")
+	absolutePath, err := filepath.Abs("imgs/Painting.png")
 	// absolutePath, err := filepath.Abs("imgs/Star.png")
-	logFilename := "apple.log"
+	logFilename := "painting.log"
 	if err != nil {
 		fmt.Println("Error getting absolute path: ", err)
 		return
@@ -42,7 +42,7 @@ func main() {
 	}
 	imageBytes := buf.Bytes()
 
-	iterations := 10000
+	iterations := 1
 	var totalElapsed time.Duration
 	for i := 0; i < iterations; i++ {
 		client, err := rpc.DialHTTP("tcp", "localhost"+":8080")
@@ -55,7 +55,10 @@ func main() {
 		//Requesting Greyscale Service
 		var reply []byte
 		args := Args{imageBytes}
+		
+		fmt.Println("Sending image to server...")
 		err = client.Call("GreyImage.GreyscaleRPC", args, &reply)
+		fmt.Println("Received greyscale image")
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -68,6 +71,7 @@ func main() {
 			fmt.Println(err)
 		}
 		saveImage(newImg)
+		fmt.Println("Saved greyscale image")
 
 		//Saving the elapsed time of the iteration
 		err = appendTimeToFile(logFilename, rttTime, "")
