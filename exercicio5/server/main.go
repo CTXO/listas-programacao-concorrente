@@ -2,6 +2,8 @@ package main
 
 import (
   "log"
+  "context"
+  "time"
   amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -21,7 +23,7 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-	  "hello", // name
+	  "colored", // name
 	  false,   // durable
 	  false,   // delete when unused
 	  false,   // exclusive
@@ -43,9 +45,25 @@ func main() {
 	  
 	  
 	  log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	  defer cancel()
 	  for {
 		for d := range msgs {
 		  log.Printf("Received a message: %s", d.Body)
+		  body := "Greyscale image from server"
+
+		  ch.PublishWithContext(ctx, 
+				"",     // exchange
+				d.ReplyTo, // routing key
+				false,  // mandatory
+				false,  // immediate
+				
+				amqp.Publishing {
+					ContentType: "text/plain",
+					Body:        []byte(body),
+				},
+			)
+			failOnError(err, "Failed to publish a message")
 		}
 	  }
 	  
