@@ -2,7 +2,6 @@ package main
 
 import (
   "log"
-
   amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -42,16 +41,14 @@ func main() {
 	  )
 	  failOnError(err, "Failed to register a consumer")
 	  
-	  var forever chan struct{}
 	  
-	  go func() {
+	  log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	  for {
 		for d := range msgs {
 		  log.Printf("Received a message: %s", d.Body)
 		}
-	  }()
+	  }
 	  
-	  log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	  <-forever
 	
 
 }
