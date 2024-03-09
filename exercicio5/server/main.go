@@ -52,12 +52,11 @@ func main() {
 	  failOnError(err, "Failed to register a consumer")
 	  
 	  
-	  log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	  fmt.Println("Listening...")
 	  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	  defer cancel()
 	  for {
 		for d := range msgs {
-		  	log.Printf("Received a message: %s", d.Body)
 		 
 		  
 			img, err := bytesToImg(d.Body)

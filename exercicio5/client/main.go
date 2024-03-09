@@ -64,8 +64,9 @@ func main() {
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	fmt.Println("Sending image...")
 	
-	body := "Image bytes here"
 	err = ch.PublishWithContext(ctx,
 	"",     // exchange
 	coloredQueue.Name, // routing key
@@ -77,7 +78,6 @@ func main() {
 		ReplyTo: 	 greyscaleQueue.Name,
 	})
 	failOnError(err, "Failed to publish a message")
-	log.Printf(" [x] Sent image bytes: %s\n", body)
 	
 
 	msgs, err := ch.Consume(
