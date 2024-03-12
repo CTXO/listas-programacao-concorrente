@@ -40,39 +40,38 @@ func main() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	  )
-	  failOnError(err, "Failed to register a consumer")
-	  
-	  
-	  fmt.Println("Listening...")
-	  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	  defer cancel()
-	  for {
+
+
+	fmt.Println("Listening...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	for {
+		msgs, err := ch.Consume(
+			q.Name, // queue
+			"",     // consumer
+			true,   // auto-ack
+			false,  // exclusive
+			false,  // no-local
+			false,  // no-wait
+			nil,    // args
+		)
+		failOnError(err, "Failed to consume queue")
 		for d := range msgs {
-		 
-		  
+			fmt.Println("Received message")
 			img, err := bytesToImg(d.Body)
 			failOnError(err, "Fail to convert colored bytes to img")
 			
 			
-		  	pixels := imgToTensor(img)
-		  	greyScale(&pixels)
-		  	img = tensorToImg(pixels)
+			pixels := imgToTensor(img)
+			greyScale(&pixels)
+			img = tensorToImg(pixels)
 
-		  	buf := new(bytes.Buffer)
-		  	err = png.Encode(buf, img)
+			buf := new(bytes.Buffer)
+			err = png.Encode(buf, img)
 			
 			imageBytes := buf.Bytes()
 
-		  	ch.PublishWithContext(ctx, 
+			ch.PublishWithContext(ctx, 
 				"",     // exchange
 				d.ReplyTo, // routing key
 				false,  // mandatory
@@ -84,11 +83,9 @@ func main() {
 				},
 			)
 			failOnError(err, "Failed to publish a message")
+			fmt.Println("Published greyscale image")
 		}
-	  }
-	  
-	
-
+	}
 }
 
 

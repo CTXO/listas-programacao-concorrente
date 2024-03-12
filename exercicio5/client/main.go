@@ -21,7 +21,8 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	absolutePath, err := filepath.Abs("imgs/Painting.png")
+	absolutePath, err := filepath.Abs("imgs/Apple.png")
+	logFilename := "apple.log"
 	failOnError(err, "Failed to get absolutePath")
 	
 	img, err := openImage(absolutePath)
@@ -62,46 +63,68 @@ func main() {
 	  )
 	  failOnError(err, "Failed to declare queue2")
 	
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
 
-	fmt.Println("Sending image...")
-	
-	err = ch.PublishWithContext(ctx,
-	"",     // exchange
-	coloredQueue.Name, // routing key
-	false,  // mandatory
-	false,  // immediate
-	amqp.Publishing {
-		ContentType: "text/plain",
-		Body:        imageBytes,
-		ReplyTo: 	 greyscaleQueue.Name,
-	})
-	failOnError(err, "Failed to publish a message")
+	// fmt.Println("Sending image...")
 	
 
-	msgs, err := ch.Consume(
-		greyscaleQueue.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	failOnError(err, "Failed to register a consumer")
-	var receivedImage []byte
-	for msg := range msgs {
-		receivedImage = msg.Body
-		break
+	iterations := 10000
+	var totalElapsed time.Duration
+
+	for i := 0; i < iterations; i++ {
+		start := time.Now()
+		fmt.Println("Publishing")
+		err = ch.PublishWithContext(ctx,
+		"",     // exchange
+		coloredQueue.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
+		amqp.Publishing {
+			ContentType: "text/plain",
+			Body:        imageBytes,
+			ReplyTo: 	 greyscaleQueue.Name,
+		})
+		failOnError(err, "Failed to publish a message")
+		fmt.Println("Published")
+
+		
+
+		msgs, err := ch.Consume(
+			greyscaleQueue.Name, // queue
+			"",     // consumer
+			true,   // auto-ack
+			false,  // exclusive
+			false,  // no-local
+			false,  // no-wait
+			nil,    // args
+		)
+		failOnError(err, "Failed to register a consumer")
+		fmt.Println("consumed")
+		var receivedImage []byte
+		for msg := range msgs {
+			receivedImage = msg.Body
+			fmt.Println("Received greyscale image")
+			break
+		}
+		rttTime := time.Since(start)
+		totalElapsed += rttTime	
+		
+		greyscaleImg, err := bytesToImg(receivedImage)
+		failOnError(err, "Failed to transform greyscale bytes to an image object")
+		
+		err = saveImage(greyscaleImg)
+		failOnError(err, "Failed to save greyscale image")
+
+		err = appendTimeToFile(logFilename, rttTime, "")
+		failOnError(err, "Failed to append time to file")
+		fmt.Println("Finished loop")
 	}
-	
-	greyscaleImg, err := bytesToImg(receivedImage)
-	failOnError(err, "Failed to transform greyscale bytes to an image object")
-	
-	err = saveImage(greyscaleImg)
-	failOnError(err, "Failed to save greyscale image")
-	
+
+	averageElapsed := totalElapsed / time.Duration(iterations)
+	err = appendTimeToFile(logFilename, averageElapsed, "Average ")
+	failOnError(err, "Failed to append average time to file")
+
 }
 
 
@@ -144,6 +167,23 @@ func saveImage(img image.Image) error {
 	err = png.Encode(fg, img)
 	if err != nil {
 		fmt.Println("Error encoding file:", err)
+		return err
+	}
+
+	return nil
+}
+
+
+func appendTimeToFile(filename string, elapsed time.Duration, prefix string) error {
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	elapsedStr := fmt.Sprintf("%s%d\n", prefix, elapsed.Microseconds())
+
+	if _, err := file.WriteString(elapsedStr); err != nil {
 		return err
 	}
 
