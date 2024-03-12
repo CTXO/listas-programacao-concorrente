@@ -85,7 +85,6 @@ func main() {
 
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
-		fmt.Println("Publishing")
 		err = ch.PublishWithContext(ctx,
 		"",     // exchange
 		coloredQueue.Name, // routing key
@@ -97,9 +96,7 @@ func main() {
 			ReplyTo: 	 greyscaleQueue.Name,
 		})
 		failOnError(err, "Failed to publish a message")
-		fmt.Println("Published")
 
-		fmt.Println("consumed")
 		var receivedImage []byte
 		msg := <-msgs
 		receivedImage = msg.Body
@@ -114,7 +111,6 @@ func main() {
 
 		err = appendTimeToFile(logFilename, rttTime, "")
 		failOnError(err, "Failed to append time to file")
-		fmt.Println("Finished loop")
 	}
 
 	averageElapsed := totalElapsed / time.Duration(iterations)

@@ -57,7 +57,6 @@ func main() {
 		)
 		failOnError(err, "Failed to consume queue")
 		for d := range msgs {
-			fmt.Println("Received message")
 			img, err := bytesToImg(d.Body)
 			failOnError(err, "Fail to convert colored bytes to img")
 			
@@ -83,7 +82,6 @@ func main() {
 				},
 			)
 			failOnError(err, "Failed to publish a message")
-			fmt.Println("Published greyscale image")
 		}
 	}
 }
