@@ -72,6 +72,17 @@ func main() {
 	iterations := 10000
 	var totalElapsed time.Duration
 
+	msgs, err := ch.Consume(
+		greyscaleQueue.Name, // queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	failOnError(err, "Failed to register a consumer")
+
 	for i := 0; i < iterations; i++ {
 		start := time.Now()
 		fmt.Println("Publishing")
@@ -88,25 +99,10 @@ func main() {
 		failOnError(err, "Failed to publish a message")
 		fmt.Println("Published")
 
-		
-
-		msgs, err := ch.Consume(
-			greyscaleQueue.Name, // queue
-			"",     // consumer
-			true,   // auto-ack
-			false,  // exclusive
-			false,  // no-local
-			false,  // no-wait
-			nil,    // args
-		)
-		failOnError(err, "Failed to register a consumer")
 		fmt.Println("consumed")
 		var receivedImage []byte
-		for msg := range msgs {
-			receivedImage = msg.Body
-			fmt.Println("Received greyscale image")
-			break
-		}
+		msg := <-msgs
+		receivedImage = msg.Body
 		rttTime := time.Since(start)
 		totalElapsed += rttTime	
 		
