@@ -1,17 +1,17 @@
 package main
 
 import (
-  "context"
-  "log"
-  "time"
-  "os"
-  "image"
-  "image/png"
-  "fmt"
-  "path/filepath"
-  "bytes"
+	"bytes"
+	"context"
+	"fmt"
+	"image"
+	"image/png"
+	"log"
+	"os"
+	"path/filepath"
+	"time"
 
-  amqp "github.com/rabbitmq/amqp091-go"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func failOnError(err error, msg string) {
@@ -69,7 +69,7 @@ func main() {
 	// fmt.Println("Sending image...")
 	
 
-	iterations := 10000
+	iterations := 50
 	var totalElapsed time.Duration
 
 	msgs, err := ch.Consume(
@@ -112,6 +112,14 @@ func main() {
 		err = appendTimeToFile(logFilename, rttTime, "")
 		failOnError(err, "Failed to append time to file")
 	}
+
+	_, err = ch.QueueDelete(
+		greyscaleQueue.Name, 
+		false,   // ifUnused
+		false,   // ifEmpty
+		false,   // noWait
+	)
+	failOnError(err, "Failed to delete queue");
 
 	averageElapsed := totalElapsed / time.Duration(iterations)
 	err = appendTimeToFile(logFilename, averageElapsed, "Average ")
