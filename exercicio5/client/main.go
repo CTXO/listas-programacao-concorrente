@@ -21,8 +21,8 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	absolutePath, err := filepath.Abs("imgs/Apple.png")
-	logFilename := "apple.log"
+	absolutePath, err := filepath.Abs("imgs/Cake.png")
+	logFilename := "cake.log"
 	failOnError(err, "Failed to get absolutePath")
 	
 	img, err := openImage(absolutePath)
@@ -69,7 +69,7 @@ func main() {
 	// fmt.Println("Sending image...")
 	
 
-	iterations := 50
+	iterations := 10000
 	var totalElapsed time.Duration
 
 	msgs, err := ch.Consume(
